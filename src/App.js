@@ -19,6 +19,12 @@ export default function TimerApp() {
     setTimers(newTimers);
   };
 
+  const resetTimer = (index) => {
+    const newTimers = [...timers];
+    newTimers[index] = null;
+    setTimers(newTimers);
+  };
+
   const getTimeRemaining = (endTime) => {
     // Timer hasn't been started yet
     if (!endTime) return "00:00";
@@ -69,12 +75,22 @@ export default function TimerApp() {
       {timers.map((endTime, index) => {
         const remainingText = getTimeRemaining(endTime);
         const isBossSpawn = remainingText === "Boss Spawn";
+        const remainingSeconds = (endTime - Date.now()) / 1000;
+        const isWarning = !isBossSpawn && endTime && remainingSeconds < 60;
+        const isCritical = !isBossSpawn && endTime && remainingSeconds < 30;
         return (
           <div
             key={index}
             style={{
               ...cellStyle,
-              border: isBossSpawn ? "2px solid red" : "1px solid #ccc",
+              border: isBossSpawn
+                ? "2px solid red"
+                : isCritical && tick % 2 === 0
+                ? "2px solid red"
+                : isWarning && tick % 2 === 0
+                ? "2px solid yellow"
+                : "1px solid #ccc",
+              backgroundColor: "#333",
             }}
           >
             <h2 style={{ fontWeight: "bold", fontSize: "14px", color: "white" }}>
@@ -111,6 +127,17 @@ export default function TimerApp() {
                 Lightning
               </button>
             </div>
+            <button
+              style={{
+                ...buttonStyle,
+                backgroundColor: "#EF4444",
+                color: "white",
+                marginTop: "4px",
+              }}
+              onClick={() => resetTimer(index)}
+            >
+              Reset
+            </button>
           </div>
         );
       })}
